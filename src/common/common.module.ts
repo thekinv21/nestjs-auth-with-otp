@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { CommonModule } from './common/common.module'
+import { OtpService } from './otp/otp.service'
 
 @Module({
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true
-		}),
-		CommonModule
+		})
 	],
 	controllers: [],
-	providers: []
+	providers: [],
+	exports: [OtpService]
 })
-export class AppModule {}
+export class CommonModule {}
