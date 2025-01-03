@@ -6,10 +6,9 @@ import { CommonModule } from './common/common.module'
 	imports: [
 		ConfigModule.forRoot({
 			isGlobal: true
-		}),
-		CommonModule
+		})
 	],
 	controllers: [],
-	providers: []
+	providers: [CommonModule]
 })
 export class AppModule {}
