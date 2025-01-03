@@ -6,3 +6,10 @@ export class AuthResponse {
 	accessTokenExpiresIn: Date
 	user: UserDto
 }
+
+export class TokenResponse {
+	accessToken: string
+	refreshToken: string
+	accessTokenExpiryDate: string
+	refreshTokenExpiryDate: string
+}

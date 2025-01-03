@@ -1,11 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import {
-	IsArray,
-	IsEmail,
-	IsNotEmpty,
-	IsOptional,
-	IsString
-} from 'class-validator'
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator'
 
 export class LoginDto {
 	@ApiProperty({
@@ -80,16 +74,6 @@ export class RegisterDto {
 		message: 'Password is required'
 	})
 	password: string
-
-	@ApiProperty({
-		description: 'Roles of the user',
-		example: ['USER']
-	})
-	@IsArray()
-	@IsString({
-		each: true
-	})
-	roles?: string[]
 
 	@ApiProperty({
 		description: 'Status of the user',
