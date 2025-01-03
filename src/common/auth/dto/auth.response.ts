@@ -1,9 +1,7 @@
 import { UserDto } from '../../user/dto/user.response'
 
 export class AuthResponse {
-	accessToken: string
-	refreshToken: string
-	accessTokenExpiresIn: Date
+	token: TokenResponse
 	user: UserDto
 }
 

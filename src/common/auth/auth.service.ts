@@ -1,33 +1,80 @@
 import { PrismaService } from '@/root/prisma'
-import { Injectable } from '@nestjs/common'
-import { randomBytes } from 'crypto'
+import {
+	Injectable,
+	NotFoundException,
+	UnauthorizedException
+} from '@nestjs/common'
+
+import { hash, verify } from 'argon2'
+import { plainToInstance } from 'class-transformer'
+import { UUID } from 'crypto'
+
+import { UserDto } from '../user/dto/user.response'
 import { UserService } from '../user/user.service'
 import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/auth.request'
-import { AuthResponse } from './dto/auth.response'
+import { AuthResponse, TokenResponse } from './dto/auth.response'
 import { JwtAuthService } from './jwt/jwt.service'
 
 @Injectable()
 export class AuthService {
 	constructor(
 		private readonly prismaService: PrismaService,
-		private readonly userService: UserService,
-		private readonly jwtAuthService: JwtAuthService
+		private readonly jwtService: JwtAuthService,
+		private readonly userService: UserService
 	) {}
 
-	public login(dto: LoginDto): Promise<AuthResponse> {
-		return null
+	async getProfile(id: UUID): Promise<UserDto> {
+		return await this.userService.getById(id)
 	}
 
-	public register(dto: RegisterDto): Promise<AuthResponse> {
-		return null
+	async register(dto: RegisterDto): Promise<AuthResponse | null> {
+		// await this.userService.isUnique(dto.username, dto.email)
+
+		const newUser = plainToInstance(
+			UserDto,
+			await this.prismaService.user.create({
+				data: {
+					...dto,
+					password: await hash(dto.password)
+				}
+			})
+		)
+		const response: AuthResponse = {
+			user: newUser,
+			token: await this.jwtService.generateTokens(newUser.id as UUID)
+		}
+
+		return response
 	}
 
-	public refreshToken(dto: RefreshTokenDto): Promise<AuthResponse> {
-		return null
+	async login(dto: LoginDto): Promise<AuthResponse | null> {
+		const user = await this.validateUser(dto)
+		const response: AuthResponse = {
+			user: user,
+			token: await this.jwtService.generateTokens(user?.id as UUID)
+		}
+		return response
 	}
 
-	public createOTPCode(): string {
-		const buffer = randomBytes(3)
-		return ((parseInt(buffer.toString('hex'), 16) % 900000) + 100000).toString()
+	async refreshToken(dto: RefreshTokenDto): Promise<TokenResponse | null> {
+		const tokens = await this.jwtService.getNewTokens(dto)
+		return tokens
+	}
+
+	async validateUser(dto: LoginDto) {
+		const user = await this.prismaService.user.findUnique({
+			where: {
+				username: dto.username?.toLocaleLowerCase()
+			}
+		})
+		if (!user) throw new NotFoundException('User is not found!')
+
+		const isValid = await verify(user?.password, dto.password)
+
+		if (!isValid) {
+			throw new UnauthorizedException('Invalid Credentials')
+		}
+
+		return plainToInstance(UserDto, user)
 	}
 }

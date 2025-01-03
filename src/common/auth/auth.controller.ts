@@ -2,7 +2,7 @@ import { Body, Controller, Post } from '@nestjs/common'
 import { ApiOperation } from '@nestjs/swagger'
 import { AuthService } from './auth.service'
 import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/auth.request'
-import { AuthResponse } from './dto/auth.response'
+import { AuthResponse, TokenResponse } from './dto/auth.response'
 
 @Controller('auth')
 export class AuthController {
@@ -22,7 +22,7 @@ export class AuthController {
 
 	@ApiOperation({ summary: 'Refresh token' })
 	@Post('/refresh-token')
-	async refreshToken(@Body() dto: RefreshTokenDto): Promise<AuthResponse> {
+	async refreshToken(@Body() dto: RefreshTokenDto): Promise<TokenResponse> {
 		return this.authService.refreshToken(dto)
 	}
 }
