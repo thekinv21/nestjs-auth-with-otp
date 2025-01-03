@@ -1,12 +1,16 @@
 import { PrismaService } from '@/root/prisma'
 import { Injectable } from '@nestjs/common'
 import { randomBytes } from 'crypto'
+import { UserService } from '../user/user.service'
 import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/auth.request'
 import { AuthResponse } from './dto/auth.response'
 
 @Injectable()
 export class AuthService {
-	constructor(private readonly prismaService: PrismaService) {}
+	constructor(
+		private readonly prismaService: PrismaService,
+		private readonly userService: UserService
+	) {}
 
 	public login(dto: LoginDto): Promise<AuthResponse> {
 		return null
