@@ -10,8 +10,6 @@ import { swagger } from './config'
 async function bootstrap() {
 	const app = await NestFactory.create(AppModule)
 
-	app.enableCors()
-
 	app.setGlobalPrefix('api')
 	app.useGlobalFilters(new GlobalExceptionFilter())
 	app.useGlobalInterceptors(new ApiResponseInterceptor())

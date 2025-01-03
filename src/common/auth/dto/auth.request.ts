@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsEmail, IsNotEmpty, IsOptional, IsString } from 'class-validator'
+import {
+	IsEmail,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	IsUUID,
+	MaxLength,
+	MinLength
+} from 'class-validator'
 
 export class LoginDto {
 	@ApiProperty({
@@ -93,4 +101,30 @@ export class RefreshTokenDto {
 		message: 'Refresh token is required'
 	})
 	refreshToken: string
+}
+
+export class VerifyOtpDto {
+	@ApiProperty({
+		description: 'User ID',
+		required: true,
+		example: 'd2d6b1b9-7b9e-4a3b-9f1b-1e5b7b7f6d7b'
+	})
+	@IsUUID()
+	@IsNotEmpty({
+		message: 'UserId is required'
+	})
+	userId: string
+
+	@ApiProperty({
+		description: 'OTP',
+		required: true,
+		example: '123456'
+	})
+	@IsString()
+	@IsNotEmpty({
+		message: 'OTP is required'
+	})
+	@MinLength(6)
+	@MaxLength(6)
+	otpCode: string
 }

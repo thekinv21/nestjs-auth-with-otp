@@ -1,8 +1,13 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { ApiOperation } from '@nestjs/swagger'
 import { AuthService } from './auth.service'
-import { LoginDto, RefreshTokenDto, RegisterDto } from './dto/auth.request'
-import { AuthResponse, TokenResponse } from './dto/auth.response'
+import {
+	LoginDto,
+	RefreshTokenDto,
+	RegisterDto,
+	VerifyOtpDto
+} from './dto/auth.request'
+import { AuthResponse, LoginResponse, TokenResponse } from './dto/auth.response'
 
 @Controller('auth')
 export class AuthController {
@@ -10,7 +15,7 @@ export class AuthController {
 
 	@ApiOperation({ summary: 'Login' })
 	@Post('/login')
-	async login(@Body() dto: LoginDto): Promise<AuthResponse> {
+	async login(@Body() dto: LoginDto): Promise<LoginResponse> {
 		return this.authService.login(dto)
 	}
 
@@ -24,5 +29,11 @@ export class AuthController {
 	@Post('/refresh-token')
 	async refreshToken(@Body() dto: RefreshTokenDto): Promise<TokenResponse> {
 		return this.authService.refreshToken(dto)
+	}
+
+	@ApiOperation({ summary: 'Verify OTP' })
+	@Post('verify-otp')
+	async verifyOtp(@Body() dto: VerifyOtpDto): Promise<AuthResponse> {
+		return this.authService.verifyOtp(dto)
 	}
 }

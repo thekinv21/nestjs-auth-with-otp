@@ -1,3 +1,4 @@
+import { UUID } from 'crypto'
 import { UserDto } from '../../user/dto/user.response'
 
 export class AuthResponse {
@@ -10,4 +11,8 @@ export class TokenResponse {
 	refreshToken: string
 	accessTokenExpiryDate: string
 	refreshTokenExpiryDate: string
+}
+
+export class LoginResponse {
+	userId: UUID
 }
