@@ -34,6 +34,7 @@ export class AuthService {
 	}
 
 	async register(dto: RegisterDto): Promise<UserDto | null> {
+		// TODO: here is have bug , this code is not hashing password
 		const hashedPassword = await hash(dto.password)
 
 		const newUser = await this.prismaService.user.create({
