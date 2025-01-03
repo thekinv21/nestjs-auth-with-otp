@@ -1,5 +1,6 @@
 import { Body, Controller, Post } from '@nestjs/common'
 import { ApiOperation } from '@nestjs/swagger'
+import { UserDto } from '../user/dto/user.response'
 import { AuthService } from './auth.service'
 import {
 	LoginDto,
@@ -21,7 +22,7 @@ export class AuthController {
 
 	@ApiOperation({ summary: 'Register' })
 	@Post('/register')
-	async register(@Body() dto: RegisterDto): Promise<AuthResponse> {
+	async register(@Body() dto: RegisterDto): Promise<UserDto> {
 		return this.authService.register(dto)
 	}
 

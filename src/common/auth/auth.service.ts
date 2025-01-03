@@ -33,23 +33,17 @@ export class AuthService {
 		return await this.userService.getById(id)
 	}
 
-	async register(dto: RegisterDto): Promise<AuthResponse | null> {
-		const newUser = plainToInstance(
-			UserDto,
-			await this.prismaService.user.create({
-				data: {
-					...dto,
-					password: await hash(dto.password)
-				}
-			})
-		)
+	async register(dto: RegisterDto): Promise<UserDto | null> {
+		const hashedPassword = await hash(dto.password)
 
-		const response: AuthResponse = {
-			user: newUser,
-			token: await this.jwtService.generateTokens(newUser.id)
-		}
+		const newUser = await this.prismaService.user.create({
+			data: {
+				password: hashedPassword,
+				...dto
+			}
+		})
 
-		return response
+		return plainToInstance(UserDto, newUser)
 	}
 
 	async login(dto: LoginDto): Promise<LoginResponse> {
@@ -109,7 +103,7 @@ export class AuthService {
 	async validateUser(dto: LoginDto) {
 		const user = await this.prismaService.user.findUnique({
 			where: {
-				username: dto.username?.toLocaleLowerCase()
+				username: dto.username?.toLowerCase()
 			}
 		})
 

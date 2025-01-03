@@ -12,7 +12,7 @@ import {
 export class LoginDto {
 	@ApiProperty({
 		description: 'Username',
-		example: 'admin',
+		example: 'john_doe',
 		required: true
 	})
 	@IsString()
@@ -23,7 +23,7 @@ export class LoginDto {
 
 	@ApiProperty({
 		description: 'Password',
-		example: '*********',
+		example: '10062000',
 		required: true
 	})
 	@IsString()
