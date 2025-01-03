@@ -1,7 +1,5 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger'
 import {
-	ArrayNotEmpty,
-	IsArray,
 	IsBoolean,
 	IsEmail,
 	IsNotEmpty,
@@ -71,16 +69,6 @@ export class UserCreateDto {
 	@IsBoolean()
 	@IsOptional()
 	isActive: boolean
-
-	@ApiProperty({
-		description: 'Roles assigned to the user',
-		type: [String],
-		example: ['ADMIN', 'USER']
-	})
-	@IsArray()
-	@ArrayNotEmpty({ message: 'Role array cannot be empty' })
-	@IsString({ each: true, message: 'Each role must be a string' })
-	role: string[]
 }
 
 export class UserUpdateDto extends OmitType(UserCreateDto, [

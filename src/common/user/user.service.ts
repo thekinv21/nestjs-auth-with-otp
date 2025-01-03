@@ -1,5 +1,5 @@
 import { PrismaService } from '@/root/prisma'
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { plainToInstance } from 'class-transformer'
 import { UserCreateDto, UserUpdateDto } from './dto/user.request'
 import { UserDto } from './dto/user.response'
@@ -57,5 +57,21 @@ export class UserService {
 				isActive: !user.isActive
 			}
 		})
+	}
+
+	async isUnique(username: string, email: string): Promise<void> {
+		const isExistEmail = await this.prismaService.user.findUnique({
+			where: {
+				email: email?.toLowerCase()
+			}
+		})
+		const isExistUsername = await this.prismaService.user.findUnique({
+			where: {
+				username: username?.toLowerCase()
+			}
+		})
+		if (isExistEmail || isExistUsername) {
+			throw new ConflictException('User already exists!')
+		}
 	}
 }

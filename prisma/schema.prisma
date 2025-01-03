@@ -8,7 +8,7 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   email     String   @unique
   username  String   @unique
   firstName String?
@@ -25,5 +25,5 @@ model Role {
   name      String   @unique
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
 }
