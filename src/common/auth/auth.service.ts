@@ -20,6 +20,8 @@ import {
 import { AuthResponse, LoginResponse, TokenResponse } from './dto/auth.response'
 import { JwtAuthService } from './jwt/jwt.service'
 
+import { addMinutes } from 'date-fns'
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -51,7 +53,8 @@ export class AuthService {
 		await this.prismaService.user.update({
 			where: { id: user.id },
 			data: {
-				otpCode: otpCode
+				otpCode: otpCode,
+				otpExpiresAt: addMinutes(new Date(), 1)
 			}
 		})
 
@@ -84,12 +87,18 @@ export class AuthService {
 			throw new UnauthorizedException('Invalid OTP')
 		}
 
+		if (user.otpExpiresAt && new Date() > user.otpExpiresAt) {
+			throw new UnauthorizedException('OTP Code has expired')
+		}
+
 		await this.prismaService.user.update({
 			where: { id: user.id },
 			data: {
-				otpCode: null
+				otpCode: null,
+				otpExpiresAt: null
 			}
 		})
+
 		const tokens = await this.jwtService.generateTokens(user.id as UUID)
 
 		return {
