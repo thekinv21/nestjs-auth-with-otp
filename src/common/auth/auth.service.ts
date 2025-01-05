@@ -87,17 +87,13 @@ export class AuthService {
 			throw new UnauthorizedException('Invalid OTP')
 		}
 
-		if (user.otpExpiresAt && new Date() > user.otpExpiresAt) {
-			throw new UnauthorizedException('OTP Code has expired')
+		const isOtpExpired = user.otpExpiresAt && new Date() > user.otpExpiresAt
+		if (isOtpExpired) {
+			await this.clearOtpData(user.id)
+			throw new UnauthorizedException('OTP has expired')
 		}
 
-		await this.prismaService.user.update({
-			where: { id: user.id },
-			data: {
-				otpCode: null,
-				otpExpiresAt: null
-			}
-		})
+		await this.clearOtpData(user.id)
 
 		const tokens = await this.jwtService.generateTokens(user.id as UUID)
 
@@ -105,6 +101,16 @@ export class AuthService {
 			user: plainToInstance(UserDto, user),
 			token: tokens
 		}
+	}
+
+	private async clearOtpData(userId: string): Promise<void> {
+		await this.prismaService.user.update({
+			where: { id: userId },
+			data: {
+				otpCode: null,
+				otpExpiresAt: null
+			}
+		})
 	}
 
 	async validateUser(dto: LoginDto) {
