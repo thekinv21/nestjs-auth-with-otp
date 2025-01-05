@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType } from '@nestjs/swagger'
+import { ApiProperty } from '@nestjs/swagger'
 import {
 	IsBoolean,
 	IsEmail,
@@ -7,6 +7,7 @@ import {
 	IsString,
 	MinLength
 } from 'class-validator'
+import { UUID } from 'crypto'
 
 export class UserCreateDto {
 	@ApiProperty({
@@ -34,7 +35,7 @@ export class UserCreateDto {
 	@ApiProperty({
 		description: 'The password for the user',
 		minLength: 6,
-		example: '**********',
+		example: 'pass',
 		required: true
 	})
 	@IsString()
@@ -71,9 +72,7 @@ export class UserCreateDto {
 	isActive: boolean
 }
 
-export class UserUpdateDto extends OmitType(UserCreateDto, [
-	'password'
-] as const) {
+export class UserUpdateDto {
 	@ApiProperty({
 		description: 'The ID of the user',
 		example: '1234567890'
@@ -82,5 +81,5 @@ export class UserUpdateDto extends OmitType(UserCreateDto, [
 	@IsNotEmpty({
 		message: 'ID is required'
 	})
-	id: string
+	id: UUID
 }
