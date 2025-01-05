@@ -1,5 +1,6 @@
 import { PrismaService } from '@/root/prisma'
 import { ConflictException, Injectable } from '@nestjs/common'
+import { hash } from 'argon2'
 import { plainToInstance } from 'class-transformer'
 import { UserCreateDto, UserUpdateDto } from './dto/user.request'
 import { UserDto } from './dto/user.response'
@@ -24,8 +25,12 @@ export class UserService {
 
 	public async create(dto: UserCreateDto): Promise<UserDto> {
 		const newUser = await this.prismaService.user.create({
-			data: dto
+			data: {
+				...dto,
+				password: await hash(dto.password)
+			}
 		})
+
 		return plainToInstance(UserDto, newUser)
 	}
 

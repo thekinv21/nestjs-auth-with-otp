@@ -20,6 +20,8 @@ import {
 import { AuthResponse, LoginResponse, TokenResponse } from './dto/auth.response'
 import { JwtAuthService } from './jwt/jwt.service'
 
+import { addMinutes } from 'date-fns'
+
 @Injectable()
 export class AuthService {
 	constructor(
@@ -34,13 +36,10 @@ export class AuthService {
 	}
 
 	async register(dto: RegisterDto): Promise<UserDto | null> {
-		// TODO: here is have bug , this code is not hashing password
-		const hashedPassword = await hash(dto.password)
-
 		const newUser = await this.prismaService.user.create({
 			data: {
-				password: hashedPassword,
-				...dto
+				...dto,
+				password: await hash(dto.password)
 			}
 		})
 
@@ -54,13 +53,14 @@ export class AuthService {
 		await this.prismaService.user.update({
 			where: { id: user.id },
 			data: {
-				otpCode: otpCode
+				otpCode: otpCode,
+				otpExpiresAt: addMinutes(new Date(), 5)
 			}
 		})
 
 		await this.emailService.sendOtpEmail({
 			toEmail: user.email,
-			fullName: user.firstName + ' ' + user.lastName,
+			username: user.username,
 			code: otpCode
 		})
 
@@ -83,22 +83,38 @@ export class AuthService {
 			throw new NotFoundException('User not found!')
 		}
 
+		if (user.otpCode === null || user.otpExpiresAt === null) {
+			throw new UnauthorizedException('Try to login first')
+		}
+
 		if (user.otpCode !== dto.otpCode) {
 			throw new UnauthorizedException('Invalid OTP')
 		}
 
-		await this.prismaService.user.update({
-			where: { id: user.id },
-			data: {
-				otpCode: null
-			}
-		})
+		const isOtpExpired = user.otpExpiresAt && new Date() > user.otpExpiresAt
+		if (isOtpExpired) {
+			await this.clearOtpData(user.id)
+			throw new UnauthorizedException('OTP has expired')
+		}
+
+		await this.clearOtpData(user.id)
+
 		const tokens = await this.jwtService.generateTokens(user.id as UUID)
 
 		return {
 			user: plainToInstance(UserDto, user),
 			token: tokens
 		}
+	}
+
+	private async clearOtpData(userId: string): Promise<void> {
+		await this.prismaService.user.update({
+			where: { id: userId },
+			data: {
+				otpCode: null,
+				otpExpiresAt: null
+			}
+		})
 	}
 
 	async validateUser(dto: LoginDto) {

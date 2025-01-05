@@ -22,7 +22,7 @@ export class EmailService {
 				TemplateId: this.configService.get<number>('POSTMARK_OTP_TEMPLATE_ID'),
 				TemplateModel: {
 					code: dto.code,
-					fullName: dto.fullName
+					username: dto.username
 				}
 			})
 
