@@ -60,7 +60,7 @@ export class AuthService {
 
 		await this.emailService.sendOtpEmail({
 			toEmail: user.email,
-			fullName: user.firstName + ' ' + user.lastName,
+			username: user.username,
 			code: otpCode
 		})
 

@@ -31,10 +31,10 @@ export class OtpEmailRequestDto {
 	code: string
 
 	@ApiProperty({
-		description: 'Full name of the user',
-		example: 'John Doe'
+		description: 'Username of user',
+		example: 'john_doe'
 	})
 	@IsString()
 	@IsNotEmpty()
-	fullName: string
+	username: string
 }
