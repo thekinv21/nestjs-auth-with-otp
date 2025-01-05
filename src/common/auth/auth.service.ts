@@ -54,7 +54,7 @@ export class AuthService {
 			where: { id: user.id },
 			data: {
 				otpCode: otpCode,
-				otpExpiresAt: addMinutes(new Date(), 1)
+				otpExpiresAt: addMinutes(new Date(), 5)
 			}
 		})
 
