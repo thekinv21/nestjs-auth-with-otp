@@ -83,6 +83,10 @@ export class AuthService {
 			throw new NotFoundException('User not found!')
 		}
 
+		if (user.otpCode === null || user.otpExpiresAt === null) {
+			throw new UnauthorizedException('Try to login first')
+		}
+
 		if (user.otpCode !== dto.otpCode) {
 			throw new UnauthorizedException('Invalid OTP')
 		}
